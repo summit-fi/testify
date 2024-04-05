@@ -12,6 +12,6 @@ func TestAssertions_GetIgnoredFields(t *testing.T) {
 func TestAssertions_SetIgnoredFields(t *testing.T) {
 	mockT := new(testing.T)
 	test := New(mockT)
-	test.SetIgnoredFields("b", "c")
+	test.SetIgnoredFields("c", "b")
 	Equal(t, []string{"c", "b"}, test.GetIgnoredFields())
 }

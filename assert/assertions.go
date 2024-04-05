@@ -1765,11 +1765,23 @@ func JSONEq(t TestingT, expected string, actual string, ignored []string, msgAnd
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
 	}
+	fmt.Println(expected, actual, ignored)
 	var expectedJSONAsInterface, actualJSONAsInterface interface{}
 
 	if len(ignored) > 0 {
+		fmt.Println("Ignoring fields")
 		expectedJSONAsInterface, actualJSONAsInterface = ignore(expected, actual, ignored)
+		return Equal(t, expectedJSONAsInterface, actualJSONAsInterface, msgAndArgs...)
 	}
+
+	if err := json.Unmarshal([]byte(expected), &expectedJSONAsInterface); err != nil {
+		return Fail(t, fmt.Sprintf("Expected value ('%s') is not valid json.\nJSON parsing error: '%s'", expected, err.Error()), msgAndArgs...)
+	}
+
+	if err := json.Unmarshal([]byte(actual), &actualJSONAsInterface); err != nil {
+		return Fail(t, fmt.Sprintf("Input ('%s') needs to be valid json.\nJSON parsing error: '%s'", actual, err.Error()), msgAndArgs...)
+	}
+	fmt.Println(expectedJSONAsInterface, actualJSONAsInterface)
 
 	return Equal(t, expectedJSONAsInterface, actualJSONAsInterface, msgAndArgs...)
 }
