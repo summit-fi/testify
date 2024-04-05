@@ -449,11 +449,12 @@ func IsTypef(t TestingT, expectedType interface{}, object interface{}, msg strin
 // JSONEqf asserts that two JSON strings are equivalent.
 //
 //	assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
-func JSONEqf(t TestingT, expected string, actual string, msg string, args ...interface{}) bool {
+func JSONEqf(t TestingT, expected string, actual string, msg string, ignored []string, args ...interface{}) bool {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
 	}
-	return JSONEq(t, expected, actual, append([]interface{}{msg}, args...)...)
+
+	return JSONEq(t, expected, actual, ignored, append([]interface{}{msg}, args...)...)
 }
 
 // Lenf asserts that the specified object has specific length.

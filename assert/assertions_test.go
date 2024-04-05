@@ -2197,53 +2197,67 @@ func TestNoDirExists(t *testing.T) {
 
 func TestJSONEq_EqualSONString(t *testing.T) {
 	mockT := new(testing.T)
-	True(t, JSONEq(mockT, `{"hello": "world", "foo": "bar"}`, `{"hello": "world", "foo": "bar"}`))
+	True(t, JSONEq(mockT, `{"hello": "world", "foo": "bar"}`, `{"hello": "world", "foo": "bar"}`, []string{}))
 }
 
 func TestJSONEq_EquivalentButNotEqual(t *testing.T) {
 	mockT := new(testing.T)
-	True(t, JSONEq(mockT, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`))
+	True(t, JSONEq(mockT, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, []string{}))
 }
 
 func TestJSONEq_HashOfArraysAndHashes(t *testing.T) {
 	mockT := new(testing.T)
 	True(t, JSONEq(mockT, "{\r\n\t\"numeric\": 1.5,\r\n\t\"array\": [{\"foo\": \"bar\"}, 1, \"string\", [\"nested\", \"array\", 5.5]],\r\n\t\"hash\": {\"nested\": \"hash\", \"nested_slice\": [\"this\", \"is\", \"nested\"]},\r\n\t\"string\": \"foo\"\r\n}",
-		"{\r\n\t\"numeric\": 1.5,\r\n\t\"hash\": {\"nested\": \"hash\", \"nested_slice\": [\"this\", \"is\", \"nested\"]},\r\n\t\"string\": \"foo\",\r\n\t\"array\": [{\"foo\": \"bar\"}, 1, \"string\", [\"nested\", \"array\", 5.5]]\r\n}"))
+		"{\r\n\t\"numeric\": 1.5,\r\n\t\"hash\": {\"nested\": \"hash\", \"nested_slice\": [\"this\", \"is\", \"nested\"]},\r\n\t\"string\": \"foo\",\r\n\t\"array\": [{\"foo\": \"bar\"}, 1, \"string\", [\"nested\", \"array\", 5.5]]\r\n}", []string{}))
 }
 
 func TestJSONEq_Array(t *testing.T) {
 	mockT := new(testing.T)
-	True(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `["foo", {"nested": "hash", "hello": "world"}]`))
+	True(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `["foo", {"nested": "hash", "hello": "world"}]`, []string{}))
 }
 
 func TestJSONEq_HashAndArrayNotEquivalent(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `{"foo": "bar", {"nested": "hash", "hello": "world"}}`))
+	False(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `{"foo": "bar", {"nested": "hash", "hello": "world"}}`, []string{}))
 }
 
 func TestJSONEq_HashesNotEquivalent(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, `{"foo": "bar"}`, `{"foo": "bar", "hello": "world"}`))
+	False(t, JSONEq(mockT, `{"foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, []string{}))
 }
 
 func TestJSONEq_ActualIsNotJSON(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, `{"foo": "bar"}`, "Not JSON"))
+	False(t, JSONEq(mockT, `{"foo": "bar"}`, "Not JSON", []string{}))
 }
 
 func TestJSONEq_ExpectedIsNotJSON(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, "Not JSON", `{"foo": "bar", "hello": "world"}`))
+	False(t, JSONEq(mockT, "Not JSON", `{"foo": "bar", "hello": "world"}`, []string{}))
 }
 
 func TestJSONEq_ExpectedAndActualNotJSON(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, "Not JSON", "Not JSON"))
+	False(t, JSONEq(mockT, "Not JSON", "Not JSON", []string{}))
 }
 
 func TestJSONEq_ArraysOfDifferentOrder(t *testing.T) {
 	mockT := new(testing.T)
-	False(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `[{ "hello": "world", "nested": "hash"}, "foo"]`))
+	False(t, JSONEq(mockT, `["foo", {"hello": "world", "nested": "hash"}]`, `[{ "hello": "world", "nested": "hash"}, "foo"]`, []string{}))
+}
+func TestJSONEq_WithIgnoredFields(t *testing.T) {
+	mockT := new(testing.T)
+	True(t, JSONEq(mockT, `{"hello": "world", "foo": "bar", "nested":"hash"}`, `{"hello": "world", "foo": "bar", "nested":"has"}`, []string{"nested"}))
+}
+func TestIgnore_WithOneIgnoredFields(t *testing.T) {
+	expectedE := map[string]interface{}{"hello": "world", "foo": "bar"}
+
+	expectedA := map[string]interface{}{"hello": "world", "foo": "bar"}
+
+	e, a := ignore(`{"hello": "world", "foo": "bar", "diff":"hash"}`, `{"hello": "world", "foo": "bar", "diff":"nested"}`, []string{"diff"})
+
+	Equal(t, expectedE, e)
+	Equal(t, expectedA, a)
 }
 
 func TestYAMLEq_EqualYAMLString(t *testing.T) {

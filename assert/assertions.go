@@ -1761,12 +1761,18 @@ func NoDirExists(t TestingT, path string, msgAndArgs ...interface{}) bool {
 // JSONEq asserts that two JSON strings are equivalent.
 //
 //	assert.JSONEq(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`)
-func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface{}) bool {
+func JSONEq(t TestingT, expected string, actual string, ignored []string, msgAndArgs ...interface{}) bool {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
 	}
+	fmt.Println(expected, actual, ignored)
 	var expectedJSONAsInterface, actualJSONAsInterface interface{}
 
+	if len(ignored) > 0 {
+		fmt.Println("Ignoring fields")
+		expectedJSONAsInterface, actualJSONAsInterface = ignore(expected, actual, ignored)
+	}
+	fmt.Println(expectedJSONAsInterface, actualJSONAsInterface)
 	if err := json.Unmarshal([]byte(expected), &expectedJSONAsInterface); err != nil {
 		return Fail(t, fmt.Sprintf("Expected value ('%s') is not valid json.\nJSON parsing error: '%s'", expected, err.Error()), msgAndArgs...)
 	}
@@ -1776,6 +1782,25 @@ func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface{
 	}
 
 	return Equal(t, expectedJSONAsInterface, actualJSONAsInterface, msgAndArgs...)
+}
+
+// ignore removes the fields from the expected and actual JSON strings.
+func ignore(expected, actual string, ignored []string) (e, a interface{}) {
+	var expectedJSONAsMap, actualJSONAsMap map[string]interface{}
+
+	if err := json.Unmarshal([]byte(expected), &expectedJSONAsMap); err != nil {
+		return nil, nil
+	}
+	if err := json.Unmarshal([]byte(actual), &actualJSONAsMap); err != nil {
+		return nil, nil
+	}
+	for _, field := range ignored {
+		delete(expectedJSONAsMap, field)
+		delete(actualJSONAsMap, field)
+	}
+	fmt.Println(expectedJSONAsMap, actualJSONAsMap)
+	return expectedJSONAsMap, actualJSONAsMap
+
 }
 
 // YAMLEq asserts that two YAML strings are equivalent.
@@ -1848,6 +1873,7 @@ func diff(expected interface{}, actual interface{}) string {
 		ToDate:   "",
 		Context:  1,
 	})
+	fmt.Println(diff)
 
 	return "\n\nDiff:\n" + diff
 }

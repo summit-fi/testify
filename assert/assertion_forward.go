@@ -883,7 +883,6 @@ func (a *Assertions) IsTypef(expectedType interface{}, object interface{}, msg s
 	}
 	return IsTypef(a.t, expectedType, object, msg, args...)
 }
-
 // JSONEq asserts that two JSON strings are equivalent.
 //
 //	a.JSONEq(`{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`)
@@ -891,7 +890,8 @@ func (a *Assertions) JSONEq(expected string, actual string, msgAndArgs ...interf
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
 	}
-	return JSONEq(a.t, expected, actual, msgAndArgs...)
+	ignored := a.GetIgnoredFields()
+	return JSONEq(a.t, expected, actual, ignored, msgAndArgs...)
 }
 
 // JSONEqf asserts that two JSON strings are equivalent.
@@ -901,7 +901,8 @@ func (a *Assertions) JSONEqf(expected string, actual string, msg string, args ..
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
 	}
-	return JSONEqf(a.t, expected, actual, msg, args...)
+	ignored := a.GetIgnoredFields()
+	return JSONEqf(a.t, expected, actual, msg, ignored, args...)
 }
 
 // Len asserts that the specified object has specific length.

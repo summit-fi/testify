@@ -3,7 +3,8 @@ package assert
 // Assertions provides assertion methods around the
 // TestingT interface.
 type Assertions struct {
-	t TestingT
+	t             TestingT
+	IgnoredFields map[string]bool
 }
 
 // New makes a new Assertions object for the specified TestingT.
