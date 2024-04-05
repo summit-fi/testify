@@ -1122,11 +1122,11 @@ func IsTypef(t TestingT, expectedType interface{}, object interface{}, msg strin
 // JSONEq asserts that two JSON strings are equivalent.
 //
 //	assert.JSONEq(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`)
-func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface{}) {
+func JSONEq(t TestingT, expected string, actual string, ignored []string,msgAndArgs ...interface{}) {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
 	}
-	if assert.JSONEq(t, expected, actual, msgAndArgs...) {
+	if assert.JSONEq(t, expected, actual, ignored, msgAndArgs...) {
 		return
 	}
 	t.FailNow()
@@ -1135,11 +1135,11 @@ func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface{
 // JSONEqf asserts that two JSON strings are equivalent.
 //
 //	assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
-func JSONEqf(t TestingT, expected string, actual string, msg string, args ...interface{}) {
+func JSONEqf(t TestingT, expected string, actual string, msg string, ignored []string, args ...interface{}) {
 	if h, ok := t.(tHelper); ok {
 		h.Helper()
 	}
-	if assert.JSONEqf(t, expected, actual, msg, args...) {
+	if assert.JSONEqf(t, expected, actual, msg, ignored, args...) {
 		return
 	}
 	t.FailNow()
