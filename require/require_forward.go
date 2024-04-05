@@ -892,7 +892,8 @@ func (a *Assertions) JSONEq(expected string, actual string, msgAndArgs ...interf
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
 	}
-	JSONEq(a.t, expected, actual, msgAndArgs...)
+	ignored := a.GetIgnoredFields()
+	JSONEq(a.t, expected, actual, ignored, msgAndArgs...)
 }
 
 // JSONEqf asserts that two JSON strings are equivalent.
@@ -902,7 +903,8 @@ func (a *Assertions) JSONEqf(expected string, actual string, msg string, args ..
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
 	}
-	JSONEqf(a.t, expected, actual, msg, args...)
+	ignored := a.GetIgnoredFields()
+	JSONEqf(a.t, expected, actual, msg, ignored,args...)
 }
 
 // Len asserts that the specified object has specific length.
@@ -913,6 +915,7 @@ func (a *Assertions) Len(object interface{}, length int, msgAndArgs ...interface
 	if h, ok := a.t.(tHelper); ok {
 		h.Helper()
 	}
+
 	Len(a.t, object, length, msgAndArgs...)
 }
 

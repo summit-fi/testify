@@ -4,6 +4,8 @@ package require
 // TestingT interface.
 type Assertions struct {
 	t TestingT
+	// IgnoredFields is a map of fields to ignore when comparing structs.
+	IgnoredFields map[string]bool
 }
 
 // New makes a new Assertions object for the specified TestingT.
